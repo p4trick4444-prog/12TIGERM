@@ -1,197 +1,262 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>十二虎專屬 | 手機直排數據勝率房系統</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">十二虎 賽特II數據勝率房</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+body{
+    font-family:"Microsoft JhengHei",Arial,sans-serif;
+    background:
+        linear-gradient(rgba(0,0,0,.85),rgba(0,0,0,.95)),
+        url("temple.jpg");
+    background-size:cover;
+    background-position:center;
+    background-attachment:fixed;
+    margin:0;
+    padding:10px;
+    color:#fff;
+    display:flex;
+    justify-content:center;
+}
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700;900&display=swap');
+.container{
+    max-width:600px;
+    width:100%;
+    text-align:center;
+}
 
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #000000;
+h1{
+    color:#ffd700;
+    font-size:22px;
+    margin-bottom:10px;
+}
 
-            background-image: 
-                linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.9)),
-                url('temple.jpg');
+.buttons{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin:15px 0;
+}
 
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+button{
+    width:100%;
+    padding:16px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:linear-gradient(135deg,#ff3333,#7a0000);
+    color:#fff;
+}
 
-            color: #ffffff;
-            overflow-x: hidden;
-        }
+.loading{
+    color:#ff5555;
+    font-size:20px;
+    margin-top:10px;
+}
 
-        /* 霧氣 */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
+.success{
+    color:#00ff99;
+    margin:10px 0;
+    font-size:18px;
+}
 
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.07), transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.05), transparent 50%),
-                radial-gradient(circle at 50% 60%, rgba(255,255,255,0.04), transparent 60%);
+.slot-container{
+    display:none;
+    grid-template-columns:1fr;
+    gap:12px;
+    margin-top:10px;
+}
 
-            animation: fogMove 25s linear infinite;
-        }
+.slot{
+    background:rgba(15,15,15,.95);
+    border-radius:12px;
+    padding:16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:18px;
 
-        /* 金光 */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
+    opacity:0;
+    transform:translateY(15px);
+    transition:.3s;
 
-            background:
-                radial-gradient(circle at 50% 20%, rgba(251,191,36,0.15), transparent 60%),
-                radial-gradient(circle at 50% 80%, rgba(220,38,38,0.12), transparent 70%);
+    border:1px solid #333;
+}
 
-            mix-blend-mode: screen;
-        }
+.slot.show{
+    opacity:1;
+    transform:none;
+}
 
-        @keyframes fogMove {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(-30px, 15px); }
-            100% { transform: translate(0, 0); }
-        }
+.highest{
+    border:2px solid #ff2222;
+    box-shadow:0 0 15px rgba(255,0,0,.8);
+}
 
-        .multiplier-bounce {
-            animation: bounce 1.8s infinite;
-        }
+.high{
+    border:2px solid #ffd700;
+    box-shadow:0 0 10px rgba(255,215,0,.7);
+}
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(-8%); }
-            50% { transform: translateY(0); }
-        }
+.room{
+    color:#ffd700;
+    font-weight:bold;
+}
 
-        /* 高爆房 */
-        .glow-row {
-            border: 1px solid rgba(251, 191, 36, 0.9);
-            box-shadow: 
-                0 0 20px rgba(251, 191, 36, 0.5),
-                0 0 40px rgba(251, 191, 36, 0.25);
-            
-            background: linear-gradient(
-                90deg, 
-                rgba(220, 38, 38, 0.35), 
-                rgba(0,0,0,0.3)
-            );
+.rate{
+    font-weight:bold;
+    font-size:20px;
+}
 
-            position: relative;
-            animation: pulseGlow 2s infinite;
-        }
+@media(min-width:768px){
+    .container{max-width:900px;}
+    .slot-container{grid-template-columns:repeat(2,1fr);}
+}
 
-        .glow-row::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(#fbbf24, #fde68a);
-            box-shadow: 0 0 10px #fbbf24;
-        }
-
-        @keyframes pulseGlow {
-            0%,100% { box-shadow: 0 0 20px rgba(251,191,36,0.4); }
-            50% { box-shadow: 0 0 35px rgba(251,191,36,0.7); }
-        }
-
-        .btn-pill {
-            background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
-        }
-
-        #loader {
-            position: fixed;
-            inset: 0;
-            background: black;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-        }
-    </style>
+@media(min-width:1024px){
+    .slot-container{grid-template-columns:repeat(3,1fr);}
+}
+</style>
 </head>
 
 <body>
-<div id="loader">Loading...</div>
-<div id="root"></div>
+<div class="container">
 
-<script type="text/babel">
-const { useState, useEffect } = React;
+<h1 id="mainTitle">十二虎 賽特II數據勝率房</h1>
 
-const MultiplierBall = ({ value }) => (
-    <div className="w-8 h-8 ml-3 multiplier-bounce flex items-center justify-center bg-red-600 rounded-full text-yellow-200 font-black">
-        {value}x
-    </div>
-);
+<div class="buttons">
+    <button onclick="regenerate()">🔄 數據分析中</button>
+    <button onclick="toggleVer()">🔁 切換 I / II</button>
+</div>
 
-const App = () => {
-    const [rooms, setRooms] = useState([]);
+<div id="loading" class="loading">猛虎下山中…</div>
+<div id="success" class="success" style="display:none;">獵殺完成</div>
 
-    const generateData = () => {
-        const newRooms = Array.from({ length: 6 }, (_, i) => {
-            const prob = Math.floor(Math.random() * 45) + 50;
-            return {
-                id: i,
-                roomNo: Math.floor(Math.random() * 2500) + 1,
-                probability: prob,
-                isHigh: prob > 88,
-                multiplier: prob > 88 ? 500 : null
-            };
+<div id="slots" class="slot-container"></div>
+</div>
+
+<audio id="clickSound" preload="auto">
+    <source src="click.wav" type="audio/mpeg">
+</audio>
+
+<script>
+let version = "II";
+
+const clickSound = document.getElementById("clickSound");
+
+function playClick(){
+    if(!clickSound) return;
+    clickSound.pause();
+    clickSound.currentTime = 0;
+    clickSound.play().catch(()=>{});
+}
+
+/* ✅ 不重複房號 */
+function getUniqueRoom(used){
+    let r;
+    do{
+        r = Math.floor(Math.random()*2500)+1;
+    }while(used.has(r));
+    used.add(r);
+    return r;
+}
+
+/* 🎯 固定 6 間房：2紅 + 2金 + 2一般 */
+function generateData(){
+    const used = new Set();
+    let arr = [];
+
+    // 🔴 2 高級
+    for(let i=0;i<2;i++){
+        arr.push({
+            room:getUniqueRoom(used),
+            rate:85+Math.floor(Math.random()*11),
+            type:"highest"
         });
-        setRooms(newRooms.sort((a,b)=>b.probability-a.probability));
-    };
+    }
 
-    useEffect(() => {
-        generateData();
-        document.getElementById('loader').style.display = 'none';
-    }, []);
+    // 🟡 2 中高
+    for(let i=0;i<2;i++){
+        arr.push({
+            room:getUniqueRoom(used),
+            rate:75+Math.floor(Math.random()*10),
+            type:"high"
+        });
+    }
 
-    return (
-        <div className="p-5 max-w-md mx-auto">
-            <h1 className="text-center text-2xl font-black mb-6">十二虎數據系統</h1>
+    // ⚪ 2 普通
+    for(let i=0;i<2;i++){
+        arr.push({
+            room:getUniqueRoom(used),
+            rate:50+Math.floor(Math.random()*25),
+            type:""
+        });
+    }
 
-            {rooms.map(room => (
-                <div key={room.id}
-                    className={`p-5 mb-4 rounded-xl flex justify-between ${room.isHigh ? 'glow-row' : 'bg-zinc-900'}`}>
-                    
-                    <div>
-                        <div className="text-xs text-gray-400">房號</div>
-                        <div className="text-xl font-bold">第 {room.roomNo} 房</div>
-                    </div>
+    return arr;
+}
 
-                    <div className="flex items-center">
-                        <div className="text-right">
-                            <div className="text-xs text-gray-400">勝率</div>
-                            <div className="text-xl font-bold">{room.probability}%</div>
-                        </div>
-                        {room.isHigh && <MultiplierBall value={room.multiplier} />}
-                    </div>
-                </div>
-            ))}
+function generate(){
+    const box = document.getElementById("slots");
+    box.innerHTML = "";
+    box.style.display = "grid";
 
-            <button onClick={generateData}
-                className="btn-pill w-full h-12 rounded-full mt-6 font-bold">
-                刷新數據
-            </button>
-        </div>
-    );
-};
+    const data = generateData();
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    let i = 0;
+    function next(){
+        if(i >= data.length) return;
+
+        const d = data[i];
+        const div = document.createElement("div");
+
+        div.className = "slot " + d.type;
+        div.innerHTML = `
+            <span class="room">第 ${d.room} 房</span>
+            <span class="rate">${d.rate}%</span>
+        `;
+
+        box.appendChild(div);
+
+        setTimeout(()=>div.classList.add("show"),30);
+
+        i++;
+        setTimeout(next,120);
+    }
+
+    next();
+}
+
+function regenerate(){
+    playClick();
+
+    loading.style.display = "block";
+    success.style.display = "none";
+    slots.style.display = "none";
+
+    setTimeout(()=>{
+        loading.style.display = "none";
+        success.style.display = "block";
+        generate();
+    },1000);
+}
+
+function toggleVer(){
+    playClick();
+
+    version = version === "II" ? "I" : "II";
+
+    const text = `十二虎專屬賽特${version}數據勝率房`;
+    mainTitle.innerText = text;
+    pageTitle.innerText = text;
+
+    regenerate();
+}
+
+window.onload = regenerate;
 </script>
 
 </body>
